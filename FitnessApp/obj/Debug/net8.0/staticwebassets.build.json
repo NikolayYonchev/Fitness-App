@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "70RmAMJ9UvLsVyDd8Ta3cEyLDE4W5MN03j50GsM00qA=",
+  "Source": "FitnessApp",
+  "BasePath": "_content/FitnessApp",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
