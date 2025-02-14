@@ -19,5 +19,15 @@
       }
     ],
     "EndpointName": "GetWeatherForecast"
+  },
+  {
+    "ContainingType": "FitnessApp.Controllers.WeatherForecastController",
+    "Method": "TestError",
+    "RelativePath": "WeatherForecast/test-error",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
   }
 ]

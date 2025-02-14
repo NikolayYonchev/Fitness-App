@@ -18,7 +18,7 @@ namespace FitnessApp.Controllers
             _logger = logger;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
+        [HttpGet(Name ="GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
@@ -29,5 +29,12 @@ namespace FitnessApp.Controllers
             })
             .ToArray();
         }
+
+        [HttpGet("test-error")]
+        public IActionResult TestError()
+        {
+            throw new ArgumentException("This is a test error!");
+        }
+
     }
 }
