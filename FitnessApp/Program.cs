@@ -23,12 +23,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "yourdomain.com",
-            ValidAudience = "yourdomain.com",
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("YourSuperSecretKey"))
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],  // ?? Get from appsettings.json
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
 
+//builder.Services.AddAuthentication();
 var app = builder.Build();
 
 app.UseMiddleware<ErrorHandlingMiddleware>(); // Register error handling middleware

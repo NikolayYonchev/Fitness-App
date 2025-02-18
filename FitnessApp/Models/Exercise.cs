@@ -7,7 +7,10 @@ namespace FitnessApp.Models
     public class Exercise
     {
         public int ExerciseId { get; set; }
+        [Required]
         public string Name { get; set; }
+        [Required]
+        [Range(1,100)]
         public int CaloriesBurnedPerMinute { get; set; }
         [Required]
         public Complexity Complexity { get; set; }
