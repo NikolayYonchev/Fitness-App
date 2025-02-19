@@ -15,6 +15,8 @@ namespace FitnessApp.Models
         public Food Food { get; set; }
         public User User { get; set; }
 
+        public IEnumerable<MealLogMeal> MealLogMeals { get; set; }
+
         //one user should have many meallogs and they should reset daily
 
     }
