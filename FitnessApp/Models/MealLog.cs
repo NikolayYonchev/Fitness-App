@@ -7,13 +7,11 @@ namespace FitnessApp.Models
     {
         public int MealLogId { get; set; }
         public int FoodId { get; set; }
-        public int UserId { get; set; }
         [Required]
         public int Quantity { get; set; }
         [Required]
         public string Date { get; set; }
-        public Food Food { get; set; }
-        public User User { get; set; }
+        public Product Food { get; set; }
 
         public IEnumerable<MealLogMeal> MealLogMeals { get; set; }
 

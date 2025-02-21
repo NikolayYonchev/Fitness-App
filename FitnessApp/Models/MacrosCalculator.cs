@@ -5,7 +5,6 @@ namespace FitnessApp.Models
 {
     public class MacrosCalculator
     {
-        public int UserId { get; set; }
         [Required]
         public double Height { get; set; }
         [Required]

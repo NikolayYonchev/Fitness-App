@@ -1,5 +1,6 @@
 ﻿using FitnessApp.Models.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.Reflection.Metadata.Ecma335;
 
 namespace FitnessApp.Models
 {
@@ -8,6 +9,7 @@ namespace FitnessApp.Models
         public Workout()
         {
             Exercises = new HashSet<Exercise>();
+            //UserWorkouts = new HashSet<UserWorkout>();
         }
         public int WorkoutId { get; set; }
         [Required]
@@ -18,5 +20,6 @@ namespace FitnessApp.Models
         [Required]
         public int WorkoutDuration { get; set; }
         public IEnumerable<Exercise> Exercises { get; set; }
+        public IEnumerable<UserWorkout> UserWorkouts { get; set; }
     }
 }
