@@ -6,6 +6,10 @@ namespace FitnessApp.Models
 {
     public class Exercise
     {
+        public Exercise()
+        {
+            ExerciseWorkouts = new HashSet<ExerciseWorkout>();
+        }
         public int ExerciseId { get; set; }
         [Required]
         public string Name { get; set; }
@@ -16,5 +20,7 @@ namespace FitnessApp.Models
         public Complexity Complexity { get; set; }
         [Required]
         public BodyPart BodyPart { get; set; }
+
+        public IEnumerable<ExerciseWorkout> ExerciseWorkouts { get; set; }
     }
 }

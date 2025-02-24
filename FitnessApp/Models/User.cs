@@ -8,13 +8,16 @@ namespace FitnessApp.Models
         public User()
         {
             MealLogs = new HashSet<MealLog>();
-            //UserWorkout = new HashSet<UserWorkout>();
+            //Workouts = new HashSet<Workout>();
+            UserWorkouts = new HashSet<UserWorkout>();
         }
         [Required]
         public string Name { get; set; }
 
         public ICollection<MealLog> MealLogs { get; set; }
         public ICollection<UserWorkout> UserWorkouts { get; set; }
+        //public ICollection<Workout> Workouts { get; set; }
+
         //one user should have mealogs for each seperate day
 
     }

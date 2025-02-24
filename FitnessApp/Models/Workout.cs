@@ -8,8 +8,8 @@ namespace FitnessApp.Models
     {
         public Workout()
         {
-            Exercises = new HashSet<Exercise>();
-            //UserWorkouts = new HashSet<UserWorkout>();
+            ExerciseWorkouts = new HashSet<ExerciseWorkout>();
+            UserWorkouts = new HashSet<UserWorkout>();
         }
         public int WorkoutId { get; set; }
         [Required]
@@ -19,7 +19,7 @@ namespace FitnessApp.Models
         public BodyPart BodyPart { get; set; }
         [Required]
         public int WorkoutDuration { get; set; }
-        public IEnumerable<Exercise> Exercises { get; set; }
+        public IEnumerable<ExerciseWorkout> ExerciseWorkouts { get; set; }
         public IEnumerable<UserWorkout> UserWorkouts { get; set; }
     }
 }

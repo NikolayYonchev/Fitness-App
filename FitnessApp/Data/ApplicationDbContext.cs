@@ -11,12 +11,13 @@ namespace FitnessApp.Data
         {
         }
 
-        public DbSet<Product> Foods { get; set; }
+        public DbSet<Product> Products { get; set; }
         public DbSet<Exercise> Exercises { get; set; }
         public DbSet<Workout> Workouts { get; set; }
         public DbSet<Meal> Meals { get; set; }
         public DbSet<MealLog> MealLogs { get; set; }
         public DbSet<MealLogMeal> MealLogMeals { get; set; }
+        public DbSet<ExerciseWorkout> ExerciseWorkouts { get; set; }
         public DbSet<UserWorkout> UserWorkouts { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -28,12 +29,14 @@ namespace FitnessApp.Data
             builder.Entity<MealLogMeal>()
                 .HasKey(k => new { k.MealId, k.MealLogId });
 
-            builder.Entity<Workout>()
+            builder.Entity<ExerciseWorkout>()
+                .HasKey(k => new { k.ExerciseId, k.WorkoutId });
+           /* builder.Entity<Workout>()
                 .HasMany(x => x.Exercises)
-                .WithOne();
+                .WithOne();*/
 
             builder.Entity<Meal>()
-                .HasMany(x => x.Foods)
+                .HasMany(x => x.Products)
                 .WithOne();
 
             builder.Entity<MealLogMeal>()
@@ -45,6 +48,16 @@ namespace FitnessApp.Data
                 .HasOne(mlm => mlm.Meal)
                 .WithMany(m => m.MealLogMeals)
                 .HasForeignKey(mlm => mlm.MealId);
+
+            builder.Entity<ExerciseWorkout>()
+                .HasOne(e => e.Exercise)
+                .WithMany(w => w.ExerciseWorkouts)
+                .HasForeignKey(ei => ei.ExerciseId);
+
+            builder.Entity<ExerciseWorkout>()
+                .HasOne(e => e.Workout)
+                .WithMany(w => w.ExerciseWorkouts)
+                .HasForeignKey(ei => ei.WorkoutId);
 
             builder.Entity<UserWorkout>()
                 .HasOne(u => u.User)

@@ -4,7 +4,7 @@ namespace FitnessApp.Models
 {
     public class Product
     {
-        public int FoodId { get; set; }
+        public int ProductId { get; set; }
         [Required]
         public string Name { get; set; }
 
