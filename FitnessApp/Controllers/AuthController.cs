@@ -22,7 +22,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterModel model)
+    public async Task<IActionResult> Register(/*[FromBody]*/ RegisterModel model)
     {
         var user = new IdentityUser { UserName = model.Email, Email = model.Email };
         var result = await _userManager.CreateAsync(user, model.Password);
@@ -36,7 +36,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginModel model)
+    public async Task<IActionResult> Login(/*[FromBody]*/ LoginModel model)
     {
         var user = await _userManager.FindByEmailAsync(model.Email);
         if (user == null) return Unauthorized("Invalid credentials");

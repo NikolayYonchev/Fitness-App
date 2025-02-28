@@ -1,5 +1,6 @@
 using FitnessApp;
 using FitnessApp.Data;
+using FitnessApp.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 var app = builder.Build();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+//dark mode
+/*app.UseStaticFiles();
+app.UseSwaggerUI(options =>
+{
+    options.InjectJavascript("swagger-ui-theme.js");
+});*/
+
 
 using (var scope = app.Services.CreateScope())
 {
