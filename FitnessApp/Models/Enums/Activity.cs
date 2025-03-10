@@ -1,4 +1,6 @@
-﻿namespace FitnessApp.Models.Enums
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace FitnessApp.Models.Enums
 {
     public enum Activity
     {

@@ -1,12 +1,16 @@
 using FitnessApp;
+using FitnessApp.Controllers;
 using FitnessApp.Data;
 using FitnessApp.Middleware;
+using FitnessApp.Services;
+using FitnessApp.Services.Contracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +42,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
+
+//builder.Services.AddTransient<IUserService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services
+    .AddControllers() // or AddControllers() in a Web API
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 var app = builder.Build();
 app.UseMiddleware<ExceptionHandlingMiddleware>();

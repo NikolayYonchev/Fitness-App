@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FitnessApp.Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [Authorize] // Protects all endpoints in this controller
@@ -6,10 +7,16 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/user")]
 public class UserController : ControllerBase
 {
+    private readonly IUserService userService;
+
+    public UserController(IUserService userService)
+    {
+        this.userService = userService;
+    }
     [HttpGet("profile")]
+    //[Authorize]
     public IActionResult GetUserProfile()
     {
-        var userName = User.Identity?.Name; // Get authenticated user's name
-        return Ok(new { message = $"Hello, {userName}! This is your secure profile." });
+        return Ok(userService.GetUserProfile(User.Identity?.Name));
     }
 }
