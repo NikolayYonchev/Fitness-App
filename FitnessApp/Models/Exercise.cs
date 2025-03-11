@@ -14,8 +14,9 @@ namespace FitnessApp.Models
         [Required]
         public string Name { get; set; }
         [Required]
-        [Range(1,100)]
+        [Range(1, 100)]
         public int CaloriesBurnedPerMinute { get; set; }
+        public string? Description { get; set; }
         [Required]
         public Complexity Complexity { get; set; }
         [Required]
