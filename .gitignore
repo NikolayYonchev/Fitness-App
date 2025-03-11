@@ -408,3 +408,9 @@ packages
 bin/
 json
 suo
+# Ignore Visual Studio cache and user-specific files
+.vs/
+*.suo
+*.v2
+*.dbcache
+*.futdcache
