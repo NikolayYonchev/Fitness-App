@@ -10,11 +10,11 @@ using System.Text;
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly UserManager<User> _userManager;
+    private readonly SignInManager<User> _signInManager;
     private readonly IConfiguration _configuration;
 
-    public AuthController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IConfiguration configuration)
+    public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration configuration)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -24,7 +24,7 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(/*[FromBody]*/ RegisterModel model)
     {
-        var user = new IdentityUser { UserName = model.Email, Email = model.Email };
+        var user = new User { UserName = model.Email, Email = model.Email };  // Use 'User' instead of 'IdentityUser'
         var result = await _userManager.CreateAsync(user, model.Password);
 
         if (result.Succeeded)
@@ -48,7 +48,7 @@ public class AuthController : ControllerBase
         return Ok(new { token });
     }
 
-    private string GenerateJwtToken(IdentityUser user)
+    private string GenerateJwtToken(User user)  // Use 'User' instead of 'IdentityUser'
     {
         var claims = new List<Claim>
         {

@@ -26,7 +26,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options
 .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
@@ -190,9 +190,48 @@ using (var scope = app.Services.CreateScope()) // Create a scope to access servi
         Console.WriteLine("Exercises already exist. Skipping seeding.");
     }
 }
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
+    string[] roles = { "Admin", "User" };
 
-app.UseMiddleware<ErrorHandlingMiddleware>(); // Register error handling middleware
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+
+    string adminEmail = "admin@example.com";
+    string adminUsername = adminEmail;
+    string adminPassword = "Admin@123";
+    string firstName = "Admin";
+    string lastName = "User";
+
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+    if (adminUser == null)
+    {
+        var newUser = new User { UserName = adminUsername, Email = adminEmail, FirstName = firstName, LastName = lastName };
+        var result = await userManager.CreateAsync(newUser, adminPassword);
+
+        if (result.Succeeded)
+        {
+            var roleResult = await userManager.AddToRoleAsync(newUser, roles[0]);
+            if (!roleResult.Succeeded)
+            {
+                throw new Exception($"Failed to add 'Admin' role: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
+            }
+        }
+        else
+        {
+            throw new Exception($"Failed to create admin user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
+    }
+}
+    app.UseMiddleware<ErrorHandlingMiddleware>(); // Register error handling middleware
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

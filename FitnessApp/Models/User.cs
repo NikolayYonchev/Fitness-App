@@ -12,7 +12,8 @@ namespace FitnessApp.Models
             UserWorkouts = new HashSet<UserWorkout>();
         }
         [Required]
-        public string Name { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
 
         public ICollection<MealLog> MealLogs { get; set; }
         public ICollection<UserWorkout> UserWorkouts { get; set; }

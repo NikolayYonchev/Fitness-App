@@ -32,6 +32,7 @@ namespace FitnessApp.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Exercise>> GetExercise(int id)
         {
+            //TODO: Create a dto for that
             var exercise = await _context.Exercises.FindAsync(id);
 
             if (exercise == null)
@@ -78,6 +79,7 @@ namespace FitnessApp.Controllers
         [HttpPost]
         public async Task<ActionResult<Exercise>> PostExercise(Exercise exercise)
         {
+            //TODO: Create a dto for that
             _context.Exercises.Add(exercise);
             await _context.SaveChangesAsync();
 
