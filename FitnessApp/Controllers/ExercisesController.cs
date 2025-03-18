@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FitnessApp.Data;
 using FitnessApp.Models;
+using FitnessApp.Models.Dtos;
 
 namespace FitnessApp.Controllers
 {
@@ -30,9 +31,8 @@ namespace FitnessApp.Controllers
 
         // GET: api/Exercises/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Exercise>> GetExercise(int id)
+        public async Task<ActionResult<ExerciseDto>> GetExercise(int id)
         {
-            //TODO: Create a dto for that
             var exercise = await _context.Exercises.FindAsync(id);
 
             if (exercise == null)
@@ -40,7 +40,16 @@ namespace FitnessApp.Controllers
                 return NotFound();
             }
 
-            return exercise;
+            var result = new ExerciseDto()
+            {
+                //ExerciseId = exercise.ExerciseId,
+                Name = exercise.Name,
+                BodyPart = exercise.BodyPart,
+                CaloriesBurnedPerMinute = exercise.CaloriesBurnedPerMinute,
+                Complexity = exercise.Complexity,
+                Description = exercise.Description
+            };
+            return result;
         }
 
         // PUT: api/Exercises/5
@@ -77,9 +86,17 @@ namespace FitnessApp.Controllers
         // POST: api/Exercises
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Exercise>> PostExercise(Exercise exercise)
+        public async Task<ActionResult<Exercise>> PostExercise(ExerciseDto exerciseDto)
         {
             //TODO: Create a dto for that
+            var exercise = new Exercise()
+            {
+                Description = exerciseDto.Description,
+                Complexity = exerciseDto.Complexity,
+                CaloriesBurnedPerMinute = exerciseDto.CaloriesBurnedPerMinute,
+                BodyPart = exerciseDto.BodyPart,
+                Name = exerciseDto.Name
+            };
             _context.Exercises.Add(exercise);
             await _context.SaveChangesAsync();
 

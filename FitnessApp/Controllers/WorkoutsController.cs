@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FitnessApp.Data;
 using FitnessApp.Models;
+using FitnessApp.Models.Dtos;
 
 namespace FitnessApp.Controllers
 {
@@ -30,7 +31,7 @@ namespace FitnessApp.Controllers
 
         // GET: api/Workouts/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Workout>> GetWorkout(int id)
+        public async Task<ActionResult<WorkoutDto>> GetWorkout(int id)
         {
             var workout = await _context.Workouts.FindAsync(id);
 
@@ -39,7 +40,15 @@ namespace FitnessApp.Controllers
                 return NotFound();
             }
 
-            return workout;
+            var result = new WorkoutDto()
+            {
+                WorkoutDuration = workout.WorkoutDuration,
+                BodyPart = workout.BodyPart,
+                Description = workout.Description,
+                Name = workout.Name
+            };
+
+            return result;
         }
 
         // PUT: api/Workouts/5
@@ -76,8 +85,16 @@ namespace FitnessApp.Controllers
         // POST: api/Workouts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Workout>> PostWorkout(Workout workout)
+        public async Task<ActionResult<WorkoutDto>> PostWorkout(WorkoutDto workoutDto)
         {
+            //TODO: Add Exercises to a Workout
+            var workout = new Workout()
+            {
+                BodyPart = workoutDto.BodyPart,
+                Description =workoutDto.Description,
+                Name = workoutDto.Name,
+                WorkoutDuration = workoutDto.WorkoutDuration
+            };
             _context.Workouts.Add(workout);
             await _context.SaveChangesAsync();
 
