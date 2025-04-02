@@ -91,15 +91,66 @@ namespace FitnessApp.Controllers
             var workout = new Workout()
             {
                 BodyPart = workoutDto.BodyPart,
-                Description =workoutDto.Description,
+                Description = workoutDto.Description,
                 Name = workoutDto.Name,
-                WorkoutDuration = workoutDto.WorkoutDuration
+                WorkoutDuration = workoutDto.WorkoutDuration,
+                //Po umno e da se suzdade prazen workout
             };
             _context.Workouts.Add(workout);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetWorkout", new { id = workout.WorkoutId }, workout);
         }
+
+
+        [HttpPost("AddExercises")]
+        public async Task<IActionResult> AddExercisesToWorkout(int workoutId, List<int> exerciseIds)
+        {
+            var workout = await _context.Workouts
+                .FirstOrDefaultAsync(x => x.WorkoutId == workoutId);
+
+            if (workout == null)
+            {
+                return NotFound("Workout not found.");
+            }
+
+            // Get all exercises that match the provided IDs
+            var exercises = await _context.Exercises
+                .Where(x => exerciseIds.Contains(x.ExerciseId) && workout.BodyPart == x.BodyPart)
+                .ToListAsync();
+
+            if (exercises.Count == 0)
+            {
+                return BadRequest("No valid exercises found.");
+            }
+
+            // Find existing links to avoid duplicates
+            var existingExerciseIds = await _context.ExerciseWorkouts
+                .Where(ew => ew.WorkoutId == workoutId && exerciseIds.Contains(ew.ExerciseId))
+                .Select(ew => ew.ExerciseId)
+                .ToListAsync();
+
+            var newExerciseWorkouts = exercises
+                .Where(ex => !existingExerciseIds.Contains(ex.ExerciseId)) // Exclude existing ones
+                .Select(ex => new ExerciseWorkout
+                {
+                    ExerciseId = ex.ExerciseId,
+                    WorkoutId = workoutId
+                })
+                .ToList();
+
+            if (newExerciseWorkouts.Count == 0)
+            {
+                return BadRequest("All selected exercises are already added to the workout.");
+            }
+
+            _context.ExerciseWorkouts.AddRange(newExerciseWorkouts);
+            await _context.SaveChangesAsync();
+
+            return Ok($"Added {newExerciseWorkouts.Count} exercises to the workout.");
+        }
+
+
 
         // DELETE: api/Workouts/5
         [HttpDelete("{id}")]

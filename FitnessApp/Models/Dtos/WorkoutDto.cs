@@ -12,7 +12,5 @@ namespace FitnessApp.Models.Dtos
         public BodyPart BodyPart { get; set; }
         [Required]
         public int WorkoutDuration { get; set; }
-        public IEnumerable<ExerciseWorkout> ExerciseWorkouts { get; set; }
-
     }
 }
