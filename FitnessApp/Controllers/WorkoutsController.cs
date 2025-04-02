@@ -106,6 +106,7 @@ namespace FitnessApp.Controllers
         [HttpPost("AddExercises")]
         public async Task<IActionResult> AddExercisesToWorkout(int workoutId, List<int> exerciseIds)
         {
+            //TODO Create a Table BodyPart and Map it many to many with Exercise and Workout
             var workout = await _context.Workouts
                 .FirstOrDefaultAsync(x => x.WorkoutId == workoutId);
 

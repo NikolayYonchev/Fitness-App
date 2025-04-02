@@ -10,13 +10,14 @@ namespace FitnessApp.Models
         {
             ExerciseWorkouts = new HashSet<ExerciseWorkout>();
             UserWorkouts = new HashSet<UserWorkout>();
+            BodyParts = new List<BodyPart>();
         }
         public int WorkoutId { get; set; }
         [Required]
         public string Name { get; set; }
         public string? Description { get; set; }
         [Required]
-        public BodyPart BodyPart { get; set; }
+        public IEnumerable<BodyPart> BodyParts { get; set; }
         [Required]
         public int WorkoutDuration { get; set; }
         public IEnumerable<ExerciseWorkout> ExerciseWorkouts { get; set; }
