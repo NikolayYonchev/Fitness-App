@@ -43,7 +43,7 @@ namespace FitnessApp.Controllers
             var result = new WorkoutDto()
             {
                 WorkoutDuration = workout.WorkoutDuration,
-                BodyPart = workout.BodyPart,
+                BodyPartWorkouts = workout.BodyPartWorkouts,
                 Description = workout.Description,
                 Name = workout.Name
             };
@@ -90,7 +90,7 @@ namespace FitnessApp.Controllers
             //TODO: Add Exercises to a Workout
             var workout = new Workout()
             {
-                BodyPart = workoutDto.BodyPart,
+                BodyPartWorkouts = workoutDto.BodyPartWorkouts,
                 Description = workoutDto.Description,
                 Name = workoutDto.Name,
                 WorkoutDuration = workoutDto.WorkoutDuration,
@@ -106,52 +106,53 @@ namespace FitnessApp.Controllers
         [HttpPost("AddExercises")]
         public async Task<IActionResult> AddExercisesToWorkout(int workoutId, List<int> exerciseIds)
         {
-            //TODO Create a Table BodyPart and Map it many to many with Exercise and Workout
+            // Retrieve the workout and its associated body parts
             var workout = await _context.Workouts
+                .Include(w => w.BodyPartWorkouts) // Ensure related data is loaded
                 .FirstOrDefaultAsync(x => x.WorkoutId == workoutId);
 
             if (workout == null)
             {
-                return NotFound("Workout not found.");
+                return NotFound("Workout not found");
             }
 
-            // Get all exercises that match the provided IDs
-            var exercises = await _context.Exercises
-                .Where(x => exerciseIds.Contains(x.ExerciseId) && workout.BodyPart == x.BodyPart)
-                .ToListAsync();
-
-            if (exercises.Count == 0)
-            {
-                return BadRequest("No valid exercises found.");
-            }
-
-            // Find existing links to avoid duplicates
-            var existingExerciseIds = await _context.ExerciseWorkouts
-                .Where(ew => ew.WorkoutId == workoutId && exerciseIds.Contains(ew.ExerciseId))
-                .Select(ew => ew.ExerciseId)
-                .ToListAsync();
-
-            var newExerciseWorkouts = exercises
-                .Where(ex => !existingExerciseIds.Contains(ex.ExerciseId)) // Exclude existing ones
-                .Select(ex => new ExerciseWorkout
-                {
-                    ExerciseId = ex.ExerciseId,
-                    WorkoutId = workoutId
-                })
+            // Extract the body part IDs associated with the workout
+            var workoutBodyPartIds = workout.BodyPartWorkouts
+                .Select(wb => wb.BodyPartId)
                 .ToList();
 
-            if (newExerciseWorkouts.Count == 0)
+            // Retrieve the exercises based on the input exercise IDs
+            var exercises = await _context.Exercises
+                .Where(e => exerciseIds.Contains(e.ExerciseId))
+                .Include(e => e.BodyPartExercises) // Ensure related data is loaded
+                .ToListAsync();
+
+            // Check if all input exercises have at least one matching body part with the workout
+            foreach (var exercise in exercises)
             {
-                return BadRequest("All selected exercises are already added to the workout.");
+                bool matchesWorkout = exercise.BodyPartExercises
+                    .Any(be => workoutBodyPartIds.Contains(be.BodyPartId));
+
+                if (!matchesWorkout)
+                {
+                    return BadRequest($"Exercise {exercise.ExerciseId} does not match the workout's body parts.");
+                }
             }
 
-            _context.ExerciseWorkouts.AddRange(newExerciseWorkouts);
+            // If all exercises match, proceed with adding them to the workout
+            foreach (var exercise in exercises)
+            {
+                _context.ExerciseWorkouts.Add(new ExerciseWorkout
+                {
+                    WorkoutId = workoutId,
+                    ExerciseId = exercise.ExerciseId
+                });
+            }
+
             await _context.SaveChangesAsync();
 
-            return Ok($"Added {newExerciseWorkouts.Count} exercises to the workout.");
+            return Ok("Exercises successfully added to workout");
         }
-
-
 
         // DELETE: api/Workouts/5
         [HttpDelete("{id}")]
