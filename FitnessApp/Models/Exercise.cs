@@ -9,6 +9,7 @@ namespace FitnessApp.Models
         public Exercise()
         {
             ExerciseWorkouts = new HashSet<ExerciseWorkout>();
+            BodyPartWorkouts = new HashSet<BodyPartWorkout>();
         }
         public int ExerciseId { get; set; }
         [Required]
@@ -22,6 +23,7 @@ namespace FitnessApp.Models
         [Required]
         public BodyPart BodyPart { get; set; }
 
+        public IEnumerable<BodyPartWorkout> BodyPartWorkouts { get; set; }
         public IEnumerable<ExerciseWorkout> ExerciseWorkouts { get; set; }
     }
 }

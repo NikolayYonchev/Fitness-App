@@ -19,6 +19,10 @@ namespace FitnessApp.Data
         public DbSet<MealLogMeal> MealLogMeals { get; set; }
         public DbSet<ExerciseWorkout> ExerciseWorkouts { get; set; }
         public DbSet<UserWorkout> UserWorkouts { get; set; }
+        public DbSet<BodyPartExercise> BodyPartExercises { get; set; }
+        public DbSet<BodyPartWorkout> BodyPartWorkouts { get; set; }
+
+        public DbSet<BodyPart> BodyParts { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -68,6 +72,11 @@ namespace FitnessApp.Data
                 .HasOne(w => w.Workout)
                 .WithMany(uw => uw.UserWorkouts)
                 .HasForeignKey(wi => wi.WorkoutId);
+
+            builder.Entity<BodyPartExercise>()
+                .HasOne(e=>e.Exercise)
+                .WithMany(b=>b.BodyPart)
+                .hasfor
         }
     }
 }

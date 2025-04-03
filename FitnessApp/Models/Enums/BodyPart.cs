@@ -1,6 +1,6 @@
 ﻿namespace FitnessApp.Models.Enums
 {
-    public enum BodyPart
+  /*  public enum BodyPart
     {
         Chest,
         Back,
@@ -8,5 +8,5 @@
         Shoulders,
         Arms,
         Abs
-    }
+    }*/
 }
