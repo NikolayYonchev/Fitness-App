@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FitnessApp.Data;
 using FitnessApp.Models;
+using FitnessApp.Models.Dtos;
+using FitnessApp.Models.ViewModels;
 
 namespace FitnessApp.Controllers
 {
@@ -30,16 +32,27 @@ namespace FitnessApp.Controllers
 
         // GET: api/Meals/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Meal>> GetMeal(int id)
+        public async Task<ActionResult<MealViewModel>> GetMeal(int mealId)
         {
-            var meal = await _context.Meals.FindAsync(id);
+            var meal = await _context.Meals.FindAsync(mealId);
 
             if (meal == null)
             {
                 return NotFound();
             }
 
-            return meal;
+            var mealDto = new MealViewModel()
+            {
+                Calories = meal.Calories,
+                Fats = meal.Fats,
+                Carbs = meal.Carbs,
+                Protein = meal.Protein,
+                Description = meal.Description,
+                Name = meal.Name,
+                ProductNames = meal.Products.Select(x => x.Name).ToList()
+            };
+
+            return mealDto;
         }
 
         // PUT: api/Meals/5
@@ -76,12 +89,56 @@ namespace FitnessApp.Controllers
         // POST: api/Meals
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Meal>> PostMeal(Meal meal)
+        public async Task<ActionResult<Meal>> PostMeal(MealDto mealDto)
         {
+            //TODO Seed Products
+            if (mealDto == null)
+            {
+                return BadRequest();
+            }
+            var products = _context.Products
+            .Where(x => mealDto.ProductNames
+            .Contains(x.Name))
+            .ToList();
+
+            int calories = 0;
+            int protein = 0;
+            int fats = 0;
+            int carbs = 0;
+            //TODO Macros not assigning
+            foreach (var product in products)
+            {
+                calories = product.Calories;
+                protein = product.Protein;
+                fats = product.Fats;
+                carbs = product.Carbohydrates;
+            }
+            var meal = new Meal()
+            {
+                Name = mealDto.Name,
+                Products = products,
+                Protein = protein,
+                Calories = calories,
+                Carbs = carbs,
+                Fats = fats,
+                Description = mealDto.Description
+            };
+
+            var mealViewModel = new MealViewModel
+            {
+                MealId = meal.MealId,
+                Name = meal.Name,
+                Description = meal.Description,
+                Protein = meal.Protein,
+                Carbs = meal.Carbs,
+                Fats = meal.Fats,
+                Calories = meal.Calories,
+                ProductNames = products.Select(p => p.Name).ToList()
+            };
             _context.Meals.Add(meal);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetMeal", new { id = meal.MealId }, meal);
+            return CreatedAtAction("GetMeal", new { id = mealViewModel.MealId }, mealViewModel);
         }
 
         // DELETE: api/Meals/5

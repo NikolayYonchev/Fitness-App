@@ -16,6 +16,12 @@ namespace FitnessApp.Models
         public int MealId { get; set; }
         [Required]
         public string Name { get; set; }
+
+        public int Protein { get; set; }
+        public int Carbs { get; set; }
+        public int Fats { get; set; }
+        public int Calories { get; set; }
+        public string? Description { get; set; }
         /*[Required]
         public Food Ingredient { get; set; }*/
         public IEnumerable<Product> Products { get; set; }

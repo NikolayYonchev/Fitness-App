@@ -14,7 +14,7 @@ namespace FitnessApp.Models
 
         [Required]
         [Range(0, 500)]
-        public int Fat { get; set; }
+        public int Fats { get; set; }
 
         [Required]
         [Range(0, 500)]

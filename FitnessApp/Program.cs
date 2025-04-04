@@ -78,106 +78,216 @@ using (var scope = app.Services.CreateScope()) // Create a scope to access servi
 
     // Ensure the database is created (for in-memory or new databases)
     dbContext.Database.EnsureCreated();
-
+    if (!dbContext.Products.Any())
+    {
+        dbContext.Products.AddRange(new List<Product>
+{
+            new Product
+            {
+                Name = "Banana",
+                Calories = 100,
+                Carbohydrates = 23,
+                Fats = 0,
+                Protein = 1
+            },
+            new Product
+            {
+                Name = "Chicken Breast",
+                Calories = 165,
+                Carbohydrates = 0,
+                Fats = 4,
+                Protein = 31
+            },
+            new Product
+            {
+                Name = "Brown Rice",
+                Calories = 111,
+                Carbohydrates = 23,
+                Fats = 1,
+                Protein = 3
+            },
+            new Product
+            {
+                Name = "Broccoli",
+                Calories = 34,
+                Carbohydrates = 7,
+                Fats = 0,
+                Protein = 3
+            },
+            new Product
+            {
+                Name = "Almonds",
+                Calories = 579,
+                Carbohydrates = 22,
+                Fats = 50,
+                Protein = 21
+            },
+            new Product
+            {
+                Name = "Egg",
+                Calories = 155,
+                Carbohydrates = 1,
+                Fats = 11,
+                Protein = 13
+            },
+            new Product
+            {
+                Name = "Salmon",
+                Calories = 208,
+                Carbohydrates = 0,
+                Fats = 13,
+                Protein = 20
+            },
+        });
+    }
+    if (!dbContext.BodyParts.Any())
+    {
+        dbContext.BodyParts.AddRange(new List<BodyPart>()
+        {
+            new BodyPart()
+            {
+                Name = "Chest"
+            },
+            new BodyPart()
+            {
+                Name = "Legs"
+            },
+            new BodyPart()
+            {
+                Name = "Core"
+            },
+            new BodyPart()
+            {
+                Name = "Arms"
+            },
+            new BodyPart()
+            {
+                Name = "Back"
+            }
+        });
+        dbContext.SaveChanges();
+    }
     // Check if exercises already exist to prevent duplicates
     if (!dbContext.Exercises.Any())
     {
+        var chest = dbContext.BodyParts.FirstOrDefault(x => x.Name == "Chest");
+        var legs = dbContext.BodyParts.FirstOrDefault(x => x.Name == "Legs");
+        var core = dbContext.BodyParts.FirstOrDefault(x => x.Name == "Core");
+        var arms = dbContext.BodyParts.FirstOrDefault(x => x.Name == "Arms");
+        var back = dbContext.BodyParts.FirstOrDefault(x => x.Name == "Back");
+
         dbContext.Exercises.AddRange(new List<Exercise>
         {
-            new Exercise { Name = "Push-Up",
+            new Exercise
+            {
+                Name = "Push-Up",
                 Description = "A basic upper-body exercise",
                 CaloriesBurnedPerMinute = 8,
-                BodyPart = BodyPart.Chest,
+                BodyPart = chest,
                 Complexity = Complexity.Low
             },
-            new Exercise {
+            new Exercise
+            {
                 Name = "Squat",
                 Description = "A lower-body strength exercise",
                 CaloriesBurnedPerMinute = 7,
-                 BodyPart = BodyPart.Legs,
+                BodyPart = legs,
                 Complexity = Complexity.Medium
             },
-            new Exercise { Name = "Jumping Jacks",
+            new Exercise
+            {
+                Name = "Jumping Jacks",
                 Description = "A full-body aerobic exercise",
                 CaloriesBurnedPerMinute = 10,
-                 BodyPart = BodyPart.Chest,
+                BodyPart = legs,
                 Complexity = Complexity.Low
             },
-            new Exercise {
+            new Exercise
+            {
                   Name = "Pull-Up",
                   Description = "An upper-body exercise that strengthens the back and arms",
                   CaloriesBurnedPerMinute = 10,
-                  BodyPart = BodyPart.Back,
+                  BodyPart = back,
                   Complexity = Complexity.High
             },
-            new Exercise {
+            new Exercise
+            {
                 Name = "Plank",
                 Description = "A core-strengthening isometric exercise",
                 CaloriesBurnedPerMinute = 5,
-                BodyPart = BodyPart.Abs,
+                BodyPart = core,
                 Complexity = Complexity.Medium
             },
-            new Exercise {
+            new Exercise
+            {
                 Name = "Lunges",
                 Description = "A lower-body exercise targeting legs and glutes",
                 CaloriesBurnedPerMinute = 8,
-                BodyPart = BodyPart.Legs,
+                BodyPart = legs,
                 Complexity = Complexity.Medium
             },
-            new Exercise {
+            new Exercise
+            {
                 Name = "Burpees",
                 Description = "A high-intensity full-body exercise combining strength and cardio",
                 CaloriesBurnedPerMinute = 15,
-                BodyPart = BodyPart.Abs,
+                BodyPart = core,
                 Complexity = Complexity.High
             },
-            new Exercise {
+            new Exercise
+            {
                 Name = "Bench Press",
                 Description = "An upper-body strength exercise for chest development",
                 CaloriesBurnedPerMinute = 9,
-                BodyPart = BodyPart.Chest,
+                BodyPart = chest,
                 Complexity = Complexity.Medium
             },
-            new Exercise {
+            new Exercise
+            {
                 Name = "Bicycle Crunches",
                 Description = "A dynamic core exercise targeting abdominal muscles",
                 CaloriesBurnedPerMinute = 7,
-                BodyPart = BodyPart.Abs,
+                BodyPart = core,
                 Complexity = Complexity.Medium
             },
-            new Exercise {
+            new Exercise
+            {
                 Name = "Deadlift",
                 Description = "A compound strength exercise for posterior chain development",
                 CaloriesBurnedPerMinute = 11,
-                BodyPart = BodyPart.Back,
+                BodyPart = back,
                 Complexity = Complexity.High
             },
-            new Exercise {
+            new Exercise
+            {
                 Name = "Mountain Climbers",
                 Description = "A dynamic exercise that builds core strength and cardiovascular endurance",
                 CaloriesBurnedPerMinute = 12,
-                BodyPart = BodyPart.Abs,
+                BodyPart = core,
                 Complexity = Complexity.Medium
             },
-            new Exercise {
+            new Exercise
+            {
                 Name = "Lateral Raises",
                 Description = "An isolation exercise targeting the shoulder muscles",
                 CaloriesBurnedPerMinute = 6,
-                BodyPart = BodyPart.Shoulders,
+                BodyPart = arms,
                 Complexity = Complexity.Low
             },
-            new Exercise {
+            new Exercise
+            {
                 Name = "Russian Twists",
                 Description = "A rotational core exercise targeting the obliques",
                 CaloriesBurnedPerMinute = 7,
-                BodyPart = BodyPart.Abs,
+                BodyPart = core,
                 Complexity = Complexity.Medium
             },
-            new Exercise {
+            new Exercise
+            {
                 Name = "Bicep Curls",
                 Description = "A traditional bicep exercise",
                 CaloriesBurnedPerMinute = 7,
-                BodyPart = BodyPart.Arms,
+                BodyPart = arms,
                 Complexity = Complexity.Medium
             }
         });
@@ -231,7 +341,7 @@ using (var scope = app.Services.CreateScope())
         }
     }
 }
-    app.UseMiddleware<ErrorHandlingMiddleware>(); // Register error handling middleware
+app.UseMiddleware<ErrorHandlingMiddleware>(); // Register error handling middleware
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -245,7 +355,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-};
+}
+;
 
 app.UseHttpsRedirection();
 

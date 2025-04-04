@@ -16,13 +16,12 @@ namespace FitnessApp.Data
         public DbSet<Workout> Workouts { get; set; }
         public DbSet<Meal> Meals { get; set; }
         public DbSet<MealLog> MealLogs { get; set; }
+        public DbSet<BodyPart> BodyParts { get; set; }
         public DbSet<MealLogMeal> MealLogMeals { get; set; }
         public DbSet<ExerciseWorkout> ExerciseWorkouts { get; set; }
         public DbSet<UserWorkout> UserWorkouts { get; set; }
         public DbSet<BodyPartExercise> BodyPartExercises { get; set; }
         public DbSet<BodyPartWorkout> BodyPartWorkouts { get; set; }
-
-        public DbSet<BodyPart> BodyParts { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -35,9 +34,16 @@ namespace FitnessApp.Data
 
             builder.Entity<ExerciseWorkout>()
                 .HasKey(k => new { k.ExerciseId, k.WorkoutId });
-           /* builder.Entity<Workout>()
-                .HasMany(x => x.Exercises)
-                .WithOne();*/
+
+            builder.Entity<BodyPartWorkout>()
+                .HasKey(k => new { k.WorkoutId, k.BodyPartId });
+
+            builder.Entity<BodyPartExercise>()
+            .HasKey(k => new { k.ExerciseId, k.BodyPartId });
+
+            /* builder.Entity<Workout>()
+                 .HasMany(x => x.Exercises)
+                 .WithOne();*/
 
             builder.Entity<Meal>()
                 .HasMany(x => x.Products)
@@ -74,9 +80,15 @@ namespace FitnessApp.Data
                 .HasForeignKey(wi => wi.WorkoutId);
 
             builder.Entity<BodyPartExercise>()
-                .HasOne(e=>e.Exercise)
-                .WithMany(b=>b.BodyPart)
-                .hasfor
+                .HasOne(e => e.Exercise)
+                .WithMany(b => b.BodyPartExercises)
+                .HasForeignKey(k => k.ExerciseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<BodyPartExercise>()
+                .HasOne(b => b.BodyPart)
+                .WithMany(e => e.BodyPartExercises)
+                .HasForeignKey(k => k.BodyPartId);
         }
     }
 }

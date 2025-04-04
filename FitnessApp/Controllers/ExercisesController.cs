@@ -42,7 +42,6 @@ namespace FitnessApp.Controllers
 
             var result = new ExerciseDto()
             {
-                //ExerciseId = exercise.ExerciseId,
                 Name = exercise.Name,
                 BodyPart = exercise.BodyPart,
                 CaloriesBurnedPerMinute = exercise.CaloriesBurnedPerMinute,
