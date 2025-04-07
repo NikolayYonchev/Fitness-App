@@ -87,14 +87,12 @@ namespace FitnessApp.Controllers
         [HttpPost]
         public async Task<ActionResult<WorkoutDto>> PostWorkout(WorkoutDto workoutDto)
         {
-            //TODO: Add Exercises to a Workout
             var workout = new Workout()
             {
                 BodyPartWorkouts = workoutDto.BodyPartWorkouts,
                 Description = workoutDto.Description,
                 Name = workoutDto.Name,
                 WorkoutDuration = workoutDto.WorkoutDuration,
-                //Po umno e da se suzdade prazen workout
             };
             _context.Workouts.Add(workout);
             await _context.SaveChangesAsync();

@@ -10,8 +10,11 @@ namespace FitnessApp.Models
             MealLogMeals = new HashSet<MealLogMeal>();
         }
         public int MealLogId { get; set; }
-        [Required]
-        public int Quantity { get; set; }
+        public string UserId { get; set; }
+        //public int MealId { get; set; }
+        //public Meal Meal { get; set; }
+        //[Required]
+        //public int Quantity { get; set; }
         [Required]
         public string Date { get; set; }
 

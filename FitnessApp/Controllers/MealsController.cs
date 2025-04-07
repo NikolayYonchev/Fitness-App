@@ -25,9 +25,21 @@ namespace FitnessApp.Controllers
 
         // GET: api/Meals
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Meal>>> GetMeals()
+        public async Task<ActionResult<IEnumerable<MealViewModel>>> GetMeals()
         {
-            return await _context.Meals.ToListAsync();
+            var meals = await _context.Meals
+                .Select(x => new MealViewModel()
+                {
+                    Calories = x.Calories,
+                    Carbs = x.Carbs,
+                    Fats = x.Fats,
+                    Name = x.Name,
+                    Protein = x.Protein,
+                    ProductNames = x.Products.Select(y => y.Name)
+                })
+                .ToListAsync();
+
+            return Ok(meals);
         }
 
         // GET: api/Meals/5
@@ -91,10 +103,9 @@ namespace FitnessApp.Controllers
         [HttpPost]
         public async Task<ActionResult<Meal>> PostMeal(MealDto mealDto)
         {
-            //TODO Seed Products
             if (mealDto == null)
             {
-                return BadRequest();
+                return NotFound();
             }
             var products = _context.Products
             .Where(x => mealDto.ProductNames
@@ -105,7 +116,7 @@ namespace FitnessApp.Controllers
             int protein = 0;
             int fats = 0;
             int carbs = 0;
-            //TODO Macros not assigning
+
             foreach (var product in products)
             {
                 calories = product.Calories;

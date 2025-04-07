@@ -87,7 +87,6 @@ namespace FitnessApp.Controllers
         [HttpPost]
         public async Task<ActionResult<Exercise>> PostExercise(ExerciseDto exerciseDto)
         {
-            //TODO: Create a dto for that
             var exercise = new Exercise()
             {
                 Description = exerciseDto.Description,
