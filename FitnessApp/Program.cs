@@ -353,7 +353,7 @@ if (app.Environment.IsDevelopment())
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+    app.UseSwagger();   
     app.UseSwaggerUI();
 }
 ;
@@ -361,6 +361,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapControllers();
 

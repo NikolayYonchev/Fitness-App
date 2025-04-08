@@ -9,6 +9,8 @@ using FitnessApp.Data;
 using FitnessApp.Models;
 using FitnessApp.Models.Dtos;
 using FitnessApp.Models.ViewModels;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FitnessApp.Controllers
 {
@@ -21,6 +23,49 @@ namespace FitnessApp.Controllers
         public MealsController(ApplicationDbContext context)
         {
             _context = context;
+        }
+
+        [Authorize]
+        [HttpPost("LogMeal")]
+        public async Task<IActionResult> LogMeal(int mealId)
+        {
+            //TODO UserId returns null
+            //TODO Im not even entering the method
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var currentMeal = await _context.Meals
+                .FindAsync(mealId);
+
+            var mealLog = new MealLog()
+            {
+                Date = DateTime.UtcNow.ToString(),
+                UserId = userId,
+            };
+
+            _context.MealLogs.Add(mealLog);
+            await _context.SaveChangesAsync();
+
+            var mealLogMeal = new MealLogMeal()
+            {
+                MealId = mealId,
+                MealLogId = mealLog.MealLogId
+            };
+            
+         /*   var meal = new Meal()
+            {
+                Calories = currentMeal.Calories,
+                Carbs = currentMeal.Carbs,
+                Description = currentMeal.Description,
+                Fats = currentMeal.Fats,
+                Name = currentMeal.Name,
+                Protein = currentMeal.Protein,
+                Products = currentMeal.Products
+            };*/
+
+            _context.MealLogMeals.Add(mealLogMeal);
+            await _context.SaveChangesAsync();
+
+            return Ok();
         }
 
         // GET: api/Meals
