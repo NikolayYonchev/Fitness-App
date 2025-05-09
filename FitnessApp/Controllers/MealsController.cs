@@ -11,6 +11,7 @@ using FitnessApp.Models.Dtos;
 using FitnessApp.Models.ViewModels;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace FitnessApp.Controllers
 {
@@ -23,49 +24,6 @@ namespace FitnessApp.Controllers
         public MealsController(ApplicationDbContext context)
         {
             _context = context;
-        }
-
-        [Authorize]
-        [HttpPost("LogMeal")]
-        public async Task<IActionResult> LogMeal(int mealId)
-        {
-            //TODO UserId returns null
-            //TODO Im not even entering the method
-            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            var currentMeal = await _context.Meals
-                .FindAsync(mealId);
-
-            var mealLog = new MealLog()
-            {
-                Date = DateTime.UtcNow.ToString(),
-                UserId = userId,
-            };
-
-            _context.MealLogs.Add(mealLog);
-            await _context.SaveChangesAsync();
-
-            var mealLogMeal = new MealLogMeal()
-            {
-                MealId = mealId,
-                MealLogId = mealLog.MealLogId
-            };
-            
-         /*   var meal = new Meal()
-            {
-                Calories = currentMeal.Calories,
-                Carbs = currentMeal.Carbs,
-                Description = currentMeal.Description,
-                Fats = currentMeal.Fats,
-                Name = currentMeal.Name,
-                Protein = currentMeal.Protein,
-                Products = currentMeal.Products
-            };*/
-
-            _context.MealLogMeals.Add(mealLogMeal);
-            await _context.SaveChangesAsync();
-
-            return Ok();
         }
 
         // GET: api/Meals
@@ -145,6 +103,7 @@ namespace FitnessApp.Controllers
 
         // POST: api/Meals
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        
         [HttpPost]
         public async Task<ActionResult<Meal>> PostMeal(MealDto mealDto)
         {
@@ -195,6 +154,48 @@ namespace FitnessApp.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetMeal", new { id = mealViewModel.MealId }, mealViewModel);
+        }
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("LogMeal")]
+        public async Task<ActionResult<MealLog>> LogMeal(int mealId)
+        {
+            //TODO UserId returns null
+            //var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var currentMeal = await _context.Meals
+                .FindAsync(mealId);
+
+            var mealLog = new MealLog()
+            {
+                Date = DateTime.UtcNow.ToString(),
+                UserId = userId,
+            };
+
+            _context.MealLogs.Add(mealLog);
+            await _context.SaveChangesAsync();
+
+            var mealLogMeal = new MealLogMeal()
+            {
+                MealId = mealId,
+                MealLogId = mealLog.MealLogId
+            };
+
+            /*   var meal = new Meal()
+               {
+                   Calories = currentMeal.Calories,
+                   Carbs = currentMeal.Carbs,
+                   Description = currentMeal.Description,
+                   Fats = currentMeal.Fats,
+                   Name = currentMeal.Name,
+                   Protein = currentMeal.Protein,
+                   Products = currentMeal.Products
+               };*/
+
+            _context.MealLogMeals.Add(mealLogMeal);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(LogMeal), new { id = mealLog.MealLogId }, mealLog);
         }
 
         // DELETE: api/Meals/5
