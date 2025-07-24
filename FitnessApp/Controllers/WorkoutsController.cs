@@ -104,9 +104,8 @@ namespace FitnessApp.Controllers
         [HttpPost("AddExercises")]
         public async Task<IActionResult> AddExercisesToWorkout(int workoutId, List<int> exerciseIds)
         {
-            // Retrieve the workout and its associated body parts
             var workout = await _context.Workouts
-                .Include(w => w.BodyPartWorkouts) // Ensure related data is loaded
+                .Include(w => w.BodyPartWorkouts) 
                 .FirstOrDefaultAsync(x => x.WorkoutId == workoutId);
 
             if (workout == null)
@@ -114,18 +113,15 @@ namespace FitnessApp.Controllers
                 return NotFound("Workout not found");
             }
 
-            // Extract the body part IDs associated with the workout
             var workoutBodyPartIds = workout.BodyPartWorkouts
                 .Select(wb => wb.BodyPartId)
                 .ToList();
 
-            // Retrieve the exercises based on the input exercise IDs
             var exercises = await _context.Exercises
                 .Where(e => exerciseIds.Contains(e.ExerciseId))
-                .Include(e => e.BodyPartExercises) // Ensure related data is loaded
+                .Include(e => e.BodyPartExercises)
                 .ToListAsync();
 
-            // Check if all input exercises have at least one matching body part with the workout
             foreach (var exercise in exercises)
             {
                 bool matchesWorkout = exercise.BodyPartExercises
@@ -137,7 +133,6 @@ namespace FitnessApp.Controllers
                 }
             }
 
-            // If all exercises match, proceed with adding them to the workout
             foreach (var exercise in exercises)
             {
                 _context.ExerciseWorkouts.Add(new ExerciseWorkout
@@ -152,7 +147,6 @@ namespace FitnessApp.Controllers
             return Ok("Exercises successfully added to workout");
         }
 
-        // DELETE: api/Workouts/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteWorkout(int id)
         {

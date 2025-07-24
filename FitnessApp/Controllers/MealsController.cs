@@ -159,8 +159,8 @@ namespace FitnessApp.Controllers
         [HttpPost("LogMeal")]
         public async Task<ActionResult<MealLog>> LogMeal(int mealId)
         {
-            //TODO UserId returns null
-            //var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //normalno li e da trqbva da se authoriziram v postman vseki put za da se izpulni methoda i da trq
+            //da smenqm tokena v zaqvkata
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var currentMeal = await _context.Meals
@@ -195,7 +195,15 @@ namespace FitnessApp.Controllers
             _context.MealLogMeals.Add(mealLogMeal);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(LogMeal), new { id = mealLog.MealLogId }, mealLog);
+            var mealLogDto = new MealLogDto()
+            {
+                Date = mealLog.Date,
+                MealId = currentMeal.MealId,
+                MealLogId = mealLog.MealLogId,
+                UserId = userId 
+            };
+            
+            return CreatedAtAction(nameof(LogMeal), new { id = mealLog.MealLogId }, mealLogDto);
         }
 
         // DELETE: api/Meals/5
