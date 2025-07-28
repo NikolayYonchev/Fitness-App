@@ -1,5 +1,7 @@
 ﻿using FitnessApp.Models;
 using FitnessApp.Models.Enums;
+using FitnessApp.Services;
+using FitnessApp.Services.Contracts;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,21 +11,26 @@ namespace FitnessApp.Controllers
     [Route("api/macrosCalculator")]
     public class MacrosCalculatorController : Controller
     {
-        [HttpPost]
-        public IActionResult CalculateMacros(int age, double height, double weight,
-            Gender gender, Activity activity, ExerciseGoal goal)
+        private readonly IMacrosCalculatorService macrosCalculatorService;
+
+        public MacrosCalculatorController(IMacrosCalculatorService macrosCalculatorService)
         {
-            var result = new MacrosCalculator()
-            {
-                Activity = activity,
-                ExerciseGoal = goal,
-                Age = age,
-                Gender = gender,
-                Height = height,
-                Weight = weight
-            };
-            
-            return Ok(result.Calculate());
+            this.macrosCalculatorService = macrosCalculatorService;
         }
+
+        [HttpPost]
+        public IActionResult CalculateMacros(MacrosCalculator input)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = macrosCalculatorService.CalculateMacros(input);
+
+            return Ok(result);
+        }
+
+        
     }
 }

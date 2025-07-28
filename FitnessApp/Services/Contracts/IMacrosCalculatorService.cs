@@ -1,6 +1,10 @@
-﻿namespace FitnessApp.Services.Contracts
+﻿using FitnessApp.Models;
+using FitnessApp.Models.Dtos;
+
+namespace FitnessApp.Services.Contracts
 {
-    public class MacrosCalculatorService
+    public interface IMacrosCalculatorService
     {
+        public MacrosDto CalculateMacros(MacrosCalculator data);
     }
 }
