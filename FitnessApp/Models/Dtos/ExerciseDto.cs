@@ -5,7 +5,7 @@ namespace FitnessApp.Models.Dtos
 {
     public class ExerciseDto
     {
-        //public int ExerciseId { get; set; }
+        public int ExerciseId { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]

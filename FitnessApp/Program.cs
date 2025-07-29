@@ -72,7 +72,8 @@ builder.Services.AddAuthentication(options =>
 
 //builder.Services.AddTransient<IUserService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IMacrosCalculatorService, MacrosCalculatorService>();    
+builder.Services.AddScoped<IMacrosCalculatorService, MacrosCalculatorService>();
+builder.Services.AddScoped<IExerciseService, ExerciseService>();
 
 builder.Services
     .AddControllers() // or AddControllers() in a Web API

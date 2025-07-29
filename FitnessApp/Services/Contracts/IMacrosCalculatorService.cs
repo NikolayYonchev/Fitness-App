@@ -5,6 +5,6 @@ namespace FitnessApp.Services.Contracts
 {
     public interface IMacrosCalculatorService
     {
-        public MacrosDto CalculateMacros(MacrosCalculator data);
+        MacrosDto CalculateMacros(MacrosCalculator data);
     }
 }
