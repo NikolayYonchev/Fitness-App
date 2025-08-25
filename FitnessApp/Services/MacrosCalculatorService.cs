@@ -7,7 +7,6 @@ namespace FitnessApp.Services
 {
     public class MacrosCalculatorService : IMacrosCalculatorService
     {
-        //minimal api
         public MacrosDto CalculateMacros(MacrosCalculator data)
         {
             double activityFactor;
