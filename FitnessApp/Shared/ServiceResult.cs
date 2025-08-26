@@ -1,8 +1,7 @@
 ﻿namespace FitnessApp.Shared
 {
-    public class ServiceResult
+    public class ServiceResult<T> : ServiceEmptyResult
     {
-        public bool Success { get; set; }
-        public string ErrorMessage { get; set; }
+        public T? Data { get; set; }
     }
 }

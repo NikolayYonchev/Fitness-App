@@ -126,13 +126,13 @@ namespace FitnessApp.Services
             };
         }
 
-        public async Task<ServiceResult> PutWorkout(int workoutId, Workout workout)
+        public async Task<ServiceEmptyResult> PutWorkout(int workoutId, Workout workout)
         {
             if (workoutId != workout.WorkoutId)
             {
-                return new ServiceResult()
+                return new ServiceEmptyResult()
                 {
-                    Success =false,
+                    Success = false,
                     ErrorMessage = "WorkoutId doesn't match workout"
                 };
             }
