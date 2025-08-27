@@ -1,4 +1,3 @@
-using FitnessApp;
 using FitnessApp.Controllers;
 using FitnessApp.Data;
 using FitnessApp.Middleware;
@@ -53,7 +52,7 @@ builder.Services.AddAuthentication(options =>
         //ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
-}); 
+});
 
 /*builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -76,19 +75,19 @@ builder.Services.AddScoped<IMacrosCalculatorService, MacrosCalculatorService>();
 builder.Services.AddScoped<IExerciseService, ExerciseService>();
 
 builder.Services
-    .AddControllers() // or AddControllers() in a Web API
+    .AddControllers() 
     .AddJsonOptions(options =>
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
+
+
 var app = builder.Build();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
-
-//dark mode
-/*app.UseStaticFiles();
-app.UseSwaggerUI(options =>
-{
-    options.InjectJavascript("swagger-ui-theme.js");
-});*/
 
 
 using (var scope = app.Services.CreateScope())
@@ -380,7 +379,7 @@ if (app.Environment.IsDevelopment())
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();   
+    app.UseSwagger();
     app.UseSwaggerUI();
 }
 ;

@@ -5,6 +5,7 @@ namespace FitnessApp.Models.Dtos
 {
     public class WorkoutDto
     {
+        public int WorkoutId { get; set; }
         public WorkoutDto()
         {
             BodyPartWorkouts = new HashSet<BodyPartWorkout>();

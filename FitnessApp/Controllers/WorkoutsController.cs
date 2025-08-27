@@ -8,6 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using FitnessApp.Data;
 using FitnessApp.Models;
 using FitnessApp.Models.Dtos;
+using FitnessApp.Services;
+using FitnessApp.Services.Contracts;
+using FitnessApp.Shared;
+using Microsoft.AspNetCore.Http.HttpResults;
+using FitnessApp.Models.Enums;
 
 namespace FitnessApp.Controllers
 {
@@ -15,155 +20,181 @@ namespace FitnessApp.Controllers
     [ApiController]
     public class WorkoutsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IWorkoutService _service;
 
-        public WorkoutsController(ApplicationDbContext context)
+        public WorkoutsController(IWorkoutService service)
         {
-            _context = context;
+            _service = service;
         }
 
-        // GET: api/Workouts
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Workout>>> GetWorkouts()
         {
-            return await _context.Workouts.ToListAsync();
+            var result = await _service.GetWorkouts();
+
+            if (result.ErrorMessage == ErrorMessage.WorkoutNotFound)
+            {
+                return NotFound(result.ErrorMessage);
+            }
+
+            return Ok(result.Data);
         }
 
-        // GET: api/Workouts/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<WorkoutDto>> GetWorkout(int id)
+        public async Task<ActionResult<ServiceResult<WorkoutDto>>> GetWorkout(int workoutId)
         {
-            var workout = await _context.Workouts.FindAsync(id);
+            var result = await _service.GetWorkout(workoutId);
 
-            if (workout == null)
+            if (result.ErrorMessage == ErrorMessage.WorkoutNotFound)
             {
-                return NotFound();
+                return NotFound(result.ErrorMessage);
             }
 
-            var result = new WorkoutDto()
-            {
-                WorkoutDuration = workout.WorkoutDuration,
-                BodyPartWorkouts = workout.BodyPartWorkouts,
-                Description = workout.Description,
-                Name = workout.Name
-            };
-
-            return result;
+            return Ok(result.Data);
         }
 
-        // PUT: api/Workouts/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutWorkout(int id, Workout workout)
+        public async Task<IActionResult> PutWorkout(int workoutId, Workout workout)
         {
-            if (id != workout.WorkoutId)
-            {
-                return BadRequest();
-            }
+            var result = await _service.PutWorkout(workoutId, workout);
 
-            _context.Entry(workout).State = EntityState.Modified;
-
-            try
+            if (!result.Success)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!WorkoutExists(id))
+                return result.ErrorMessage switch
                 {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                    ErrorMessage.WorkoutIdNotFound => BadRequest(result.ErrorMessage),
+                    ErrorMessage.WorkoutDoesNotExist => NotFound(result.ErrorMessage),
+                    _ => StatusCode(StatusCodes.Status500InternalServerError, result.ErrorMessage)
+                };
             }
 
             return NoContent();
+
+            //if (id != workout.WorkoutId)
+            //{
+            //    return BadRequest();
+            //}
+
+            //_context.Entry(workout).State = EntityState.Modified;
+
+            //try
+            //{
+            //    await _context.SaveChangesAsync();
+            //}
+            //catch (DbUpdateConcurrencyException)
+            //{
+            //    if (!WorkoutExists(id))
+            //    {
+            //        return NotFound();
+            //    }
+            //    else
+            //    {
+            //        throw;
+            //    }
+            //}
+
+            //return NoContent();
         }
 
-        // POST: api/Workouts
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<WorkoutDto>> PostWorkout(WorkoutDto workoutDto)
+        public async Task<ActionResult<ServiceResult<WorkoutDto>>> PostWorkout(WorkoutDto workoutDto)
         {
-            var workout = new Workout()
-            {
-                BodyPartWorkouts = workoutDto.BodyPartWorkouts,
-                Description = workoutDto.Description,
-                Name = workoutDto.Name,
-                WorkoutDuration = workoutDto.WorkoutDuration,
-            };
-            _context.Workouts.Add(workout);
-            await _context.SaveChangesAsync();
+            var result = await _service.PostWorkout(workoutDto);
 
-            return CreatedAtAction("GetWorkout", new { id = workout.WorkoutId }, workout);
+            return CreatedAtAction("GetWorkout", new { id = result.Data.WorkoutId }, result.Data);
+
+            //var workout = new Workout()
+            //{
+            //    BodyPartWorkouts = workoutDto.BodyPartWorkouts,
+            //    Description = workoutDto.Description,
+            //    Name = workoutDto.Name,
+            //    WorkoutDuration = workoutDto.WorkoutDuration,
+            //};
+            //_context.Workouts.Add(workout);
+            //await _context.SaveChangesAsync();
+
+            //return CreatedAtAction("GetWorkout", new { id = workout.WorkoutId }, workout);
         }
 
 
         [HttpPost("AddExercises")]
-        public async Task<IActionResult> AddExercisesToWorkout(int workoutId, List<int> exerciseIds)
+        public async Task<ActionResult<ServiceEmptyResult>> AddExercisesToWorkout(int workoutId, List<int> exerciseIds)
         {
-            var workout = await _context.Workouts
-                .Include(w => w.BodyPartWorkouts) 
-                .FirstOrDefaultAsync(x => x.WorkoutId == workoutId);
+            var result = await _service.AddExercisesToWorkout(workoutId, exerciseIds);
 
-            if (workout == null)
+            if (!result.Success)
             {
-                return NotFound("Workout not found");
-            }
-
-            var workoutBodyPartIds = workout.BodyPartWorkouts
-                .Select(wb => wb.BodyPartId)
-                .ToList();
-
-            var exercises = await _context.Exercises
-                .Where(e => exerciseIds.Contains(e.ExerciseId))
-                .Include(e => e.BodyPartExercises)
-                .ToListAsync();
-
-            foreach (var exercise in exercises)
-            {
-                bool matchesWorkout = exercise.BodyPartExercises
-                    .Any(be => workoutBodyPartIds.Contains(be.BodyPartId));
-
-                if (!matchesWorkout)
+                if (result.ErrorMessage == ErrorMessage.BadRequest)
                 {
-                    return BadRequest($"Exercise {exercise.ExerciseId} does not match the workout's body parts.");
+                    return BadRequest(result.ErrorMessage);
+                }
+                else if (result.ErrorMessage == ErrorMessage.ExerciseDoesNotMatchBodyParts)
+                {
+                    return BadRequest(result.ErrorMessage);
                 }
             }
 
-            foreach (var exercise in exercises)
-            {
-                _context.ExerciseWorkouts.Add(new ExerciseWorkout
-                {
-                    WorkoutId = workoutId,
-                    ExerciseId = exercise.ExerciseId
-                });
-            }
+            return Ok(); 
 
-            await _context.SaveChangesAsync();
+            //var workout = await _context.Workouts
+            //    .Include(w => w.BodyPartWorkouts)
+            //    .FirstOrDefaultAsync(x => x.WorkoutId == workoutId);
 
-            return Ok("Exercises successfully added to workout");
+            //if (workout == null)
+            //{
+            //    return NotFound("Workout not found");
+            //}
+
+            //var workoutBodyPartIds = workout.BodyPartWorkouts
+            //    .Select(wb => wb.BodyPartId)
+            //    .ToList();
+
+            //var exercises = await _context.Exercises
+            //    .Where(e => exerciseIds.Contains(e.ExerciseId))
+            //    .Include(e => e.BodyPartExercises)
+            //    .ToListAsync();
+
+            //foreach (var exercise in exercises)
+            //{
+            //    bool matchesWorkout = exercise.BodyPartExercises
+            //        .Any(be => workoutBodyPartIds.Contains(be.BodyPartId));
+
+            //    if (!matchesWorkout)
+            //    {
+            //        return BadRequest($"Exercise {exercise.ExerciseId} does not match the workout's body parts.");
+            //    }
+            //}
+
+            //foreach (var exercise in exercises)
+            //{
+            //    _context.ExerciseWorkouts.Add(new ExerciseWorkout
+            //    {
+            //        WorkoutId = workoutId,
+            //        ExerciseId = exercise.ExerciseId
+            //    });
+            //}
+
+            //await _context.SaveChangesAsync();
+
+            //return Ok("Exercises successfully added to workout");
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteWorkout(int id)
+        public async Task<IActionResult> DeleteWorkout(int workoutId)
         {
-            var workout = await _context.Workouts.FindAsync(id);
-            if (workout == null)
+            var workout = await _service.DeleteWorkout(workoutId);
+
+            if (workout.ErrorMessage == ErrorMessage.WorkoutNotFound)
             {
                 return NotFound();
             }
 
-            _context.Workouts.Remove(workout);
-            await _context.SaveChangesAsync();
-
             return NoContent();
         }
 
-        private bool WorkoutExists(int id)
-        {
-            return _context.Workouts.Any(e => e.WorkoutId == id);
-        }
+        //private bool WorkoutExists(int id)
+        //{
+        //    return _context.Workouts.Any(e => e.WorkoutId == id);
+        //}
     }
 }

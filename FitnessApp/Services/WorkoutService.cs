@@ -5,6 +5,7 @@ using FitnessApp.Services.Contracts;
 using FitnessApp.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using FitnessApp.Models.Enums;
 
 namespace FitnessApp.Services
 {
@@ -16,15 +17,15 @@ namespace FitnessApp.Services
         {
             _context = context;
         }
-        public async Task<ServiceResult> AddExercisesToWorkout(int workoutId, List<int> exerciseIds)
+        public async Task<ServiceEmptyResult> AddExercisesToWorkout(int workoutId, List<int> exerciseIds)
         {
             var workout = await _context.Workouts
                 .Include(w => w.BodyPartWorkouts)
                 .FirstOrDefaultAsync(x => x.WorkoutId == workoutId);
 
-            if (workout == null)
+            if (!_context.Workouts.Any(w => w.WorkoutId == workoutId))
             {
-                return new ServiceResult { Success = false, ErrorMessage = "Workout is null" };
+                return new ServiceEmptyResult { Success = false, ErrorMessage = ErrorMessage.BadRequest/*"Workout is null" */};
             }
 
             var workoutBodyPartIds = workout.BodyPartWorkouts
@@ -43,8 +44,7 @@ namespace FitnessApp.Services
 
                 if (!matchesWorkout)
                 {
-                    //Is this the correct way of doing it
-                    return new ServiceResult { Success = false, ErrorMessage = $"Exercise {exercise.ExerciseId} does not match the workout's body parts." }; ;
+                    return new ServiceEmptyResult { Success = false, ErrorMessage = ErrorMessage.ExerciseDoesNotMatchBodyParts/*$"Exercise {exercise.ExerciseId} does not match the workout's body parts."*/ }; ;
                 }
             }
 
@@ -59,37 +59,41 @@ namespace FitnessApp.Services
 
             await _context.SaveChangesAsync();
 
-            return new ServiceResult()
+            return new ServiceEmptyResult()
             {
                 Success = true,
-                ErrorMessage = "Success!"
+                ErrorMessage = ErrorMessage.Success //"Exercises Added Successfully to Workout!"
             };
         }
 
-        public async Task<ServiceResult> DeleteWorkout(int workoutId)
+        public async Task<ServiceEmptyResult> DeleteWorkout(int workoutId)
         {
             var workout = await _context.Workouts.FindAsync(workoutId);
             if (workout == null)
             {
-                return new ServiceResult { Success = false, ErrorMessage = $"Workout is null" }; ;
+                return new ServiceEmptyResult { Success = false, ErrorMessage = ErrorMessage.BadRequest/*$"Workout is null"*/ }; ;
             }
 
             _context.Workouts.Remove(workout);
             await _context.SaveChangesAsync();
 
-            return new ServiceResult { Success = false, ErrorMessage = $"Success!" }; ;
+            return new ServiceEmptyResult { Success = false, ErrorMessage = ErrorMessage.Success /*$"Workout Deleted Successfully!"*/ }; ;
         }
 
-        public async Task<WorkoutDto> GetWorkout(int workoutId)
+        public async Task<ServiceResult<WorkoutDto>> GetWorkout(int workoutId)
         {
             var workout = await _context.Workouts.FindAsync(workoutId);
 
             if (workout == null)
             {
-                return null;
+                return new ServiceResult<WorkoutDto>()
+                {
+                    ErrorMessage = ErrorMessage.WorkoutNotFound, //"Workout is null",
+                    Success = false
+                };
             }
 
-            var result = new WorkoutDto()
+            var workoutDto = new WorkoutDto()
             {
                 WorkoutDuration = workout.WorkoutDuration,
                 BodyPartWorkouts = workout.BodyPartWorkouts,
@@ -97,15 +101,37 @@ namespace FitnessApp.Services
                 Name = workout.Name
             };
 
-            return result;
+            return new ServiceResult<WorkoutDto>()
+            {
+                ErrorMessage = ErrorMessage.Success, //"Workout Returned Successfully",
+                Data = workoutDto,
+                Success = true
+            };
         }
 
-        public async Task<IEnumerable<Workout>> GetWorkouts()
+        public async Task<ServiceResult<IEnumerable<Workout>>> GetWorkouts()
         {
-            return await _context.Workouts.ToListAsync();
+            var workouts = await _context.Workouts.ToListAsync();
+
+            if (workouts == null)
+            {
+                return new ServiceResult<IEnumerable<Workout>>()
+                {
+                    ErrorMessage = ErrorMessage.WorkoutNotFound,
+                    Data = workouts,
+                    Success = false
+                };
+            }
+
+            return new ServiceResult<IEnumerable<Workout>>()
+            {
+                ErrorMessage = ErrorMessage.Success,//"Workouts Returned Successfully",
+                Data = workouts,
+                Success = true
+            };
         }
 
-        public async Task<WorkoutDto> PostWorkout(WorkoutDto workoutDto)
+        public async Task<ServiceResult<WorkoutDto>> PostWorkout(WorkoutDto workoutDto)
         {
             var workout = new Workout()
             {
@@ -117,12 +143,19 @@ namespace FitnessApp.Services
             _context.Workouts.Add(workout);
             await _context.SaveChangesAsync();
 
-            return new WorkoutDto()
+            var newDto = new WorkoutDto()
             {
                 BodyPartWorkouts = workoutDto.BodyPartWorkouts,
                 Description = workoutDto.Description,
                 Name = workoutDto.Name,
                 WorkoutDuration = workoutDto.WorkoutDuration,
+            };
+
+            return new ServiceResult<WorkoutDto>()
+            {
+                Success = true,
+                Data = newDto,
+                ErrorMessage = ErrorMessage.Success//"Workout Created Successfully!"
             };
         }
 
@@ -133,7 +166,7 @@ namespace FitnessApp.Services
                 return new ServiceEmptyResult()
                 {
                     Success = false,
-                    ErrorMessage = "WorkoutId doesn't match workout"
+                    ErrorMessage = ErrorMessage.WorkoutIdNotFound // "WorkoutId doesn't match workout"
                 };
             }
 
@@ -147,24 +180,26 @@ namespace FitnessApp.Services
             {
                 if (!WorkoutExists(workoutId))
                 {
-                    return new ServiceResult()
+                    return new ServiceEmptyResult()
                     {
                         Success = false,
-                        ErrorMessage = "Workout does not exist"
+                        ErrorMessage = ErrorMessage.WorkoutDoesNotExist //"Workout does not exist"
                     };
                 }
                 else
                 {
+                    //this isn’t a missing workout — it’s some other concurrency issue.
                     throw;
                 }
             }
 
-            return new ServiceResult()
+            return new ServiceEmptyResult()
             {
                 Success = true,
-                ErrorMessage = "Success!"
+                ErrorMessage = ErrorMessage.Success //"Workout Modified Successfully!"
             };
         }
+
         private bool WorkoutExists(int id)
         {
             return _context.Workouts.Any(e => e.WorkoutId == id);

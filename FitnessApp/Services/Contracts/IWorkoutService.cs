@@ -6,11 +6,11 @@ namespace FitnessApp.Services.Contracts
 {
     public interface IWorkoutService
     {
-        public Task<IEnumerable<Workout>> GetWorkouts();
-        public Task<WorkoutDto> GetWorkout(int workoutId);
-        public Task<ServiceResult> PutWorkout(int id, Workout workout);
-        public Task<WorkoutDto> PostWorkout(WorkoutDto workoutDto);
-        public Task<ServiceResult> AddExercisesToWorkout(int workoutId, List<int> exerciseIds);
-        public Task<ServiceResult> DeleteWorkout(int id);
+        public Task<ServiceResult<IEnumerable<Workout>>> GetWorkouts();
+        public Task<ServiceResult<WorkoutDto>> GetWorkout(int workoutId);
+        public Task<ServiceEmptyResult> PutWorkout(int id, Workout workout);
+        public Task<ServiceResult<WorkoutDto>> PostWorkout(WorkoutDto workoutDto);
+        public Task<ServiceEmptyResult> AddExercisesToWorkout(int workoutId, List<int> exerciseIds);
+        public Task<ServiceEmptyResult> DeleteWorkout(int id);
     }
 }

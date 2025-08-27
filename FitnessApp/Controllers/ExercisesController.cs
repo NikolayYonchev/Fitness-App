@@ -16,17 +16,17 @@ namespace FitnessApp.Controllers
     [ApiController]
     public class ExercisesController : ControllerBase
     {
-        private readonly IExerciseService exerciseService;
+        private readonly IExerciseService _exerciseService;
 
         public ExercisesController(IExerciseService exerciseService)
         {
-            this.exerciseService = exerciseService;
+            _exerciseService = exerciseService;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Exercise>>> GetExercises()
         {
-            var exercises = await exerciseService.GetExercises();
+            var exercises = await _exerciseService.GetExercises();
 
             if (exercises == null) return NotFound();   
 
@@ -36,7 +36,7 @@ namespace FitnessApp.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ExerciseDto>> GetExercise(int id)
         {
-            var exercise = await exerciseService.GetExercise(id);
+            var exercise = await _exerciseService.GetExercise(id);
 
             if (exercise == null) return NotFound();
 
@@ -46,12 +46,7 @@ namespace FitnessApp.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutExercise(int id, Exercise exercise)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var wasUpdated = await exerciseService.PutExercise(id, exercise);
+            var wasUpdated = await _exerciseService.PutExercise(id, exercise);
 
             if (!wasUpdated) return NotFound();
 
@@ -61,12 +56,7 @@ namespace FitnessApp.Controllers
         [HttpPost]
         public async Task<ActionResult<Exercise>> PostExercise(ExerciseDto exerciseDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var wasPosted = await exerciseService.PostExercise(exerciseDto);
+            var wasPosted = await _exerciseService.PostExercise(exerciseDto);
 
             return CreatedAtAction(nameof(GetExercise), new { id = wasPosted.ExerciseId }, wasPosted);
         }
@@ -74,7 +64,7 @@ namespace FitnessApp.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteExercise(int id)
         {
-            var wasDeleted = await exerciseService.DeleteExercise(id);
+            var wasDeleted = await _exerciseService.DeleteExercise(id);
 
             if (!wasDeleted) return NotFound();
 
