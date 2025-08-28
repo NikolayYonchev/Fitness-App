@@ -9,6 +9,9 @@ using FitnessApp.Data;
 using FitnessApp.Models;
 using FitnessApp.Models.Dtos;
 using FitnessApp.Services.Contracts;
+using FitnessApp.Shared;
+using FitnessApp.Models.Enums;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace FitnessApp.Controllers
 {
@@ -24,31 +27,45 @@ namespace FitnessApp.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Exercise>>> GetExercises()
+        public async Task<ActionResult<ServiceResult<IEnumerable<Exercise>>>> GetExercises()
         {
-            var exercises = await _exerciseService.GetExercises();
+            var result = await _exerciseService.GetExercises();
 
-            if (exercises == null) return NotFound();   
+            if (result.ErrorMessage == ErrorMessage.ExerciseNotFound)
+            {
+                return NotFound(result.ErrorMessage);
+            }
 
-            return Ok(exercises);
+            return Ok(result.Data);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ExerciseDto>> GetExercise(int id)
+        public async Task<ActionResult<ServiceResult<ExerciseDto>>> GetExercise(int id)
         {
-            var exercise = await _exerciseService.GetExercise(id);
+            var result = await _exerciseService.GetExercise(id);
 
-            if (exercise == null) return NotFound();
+            if (result.ErrorMessage == ErrorMessage.ExerciseNotFound)
+            {
+                return NotFound(result.ErrorMessage);
+            }
 
-            return Ok(exercise);
+            return Ok(result);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutExercise(int id, Exercise exercise)
         {
-            var wasUpdated = await _exerciseService.PutExercise(id, exercise);
+            var result = await _exerciseService.PutExercise(id, exercise);
 
-            if (!wasUpdated) return NotFound();
+            if (!result.Success)
+            {
+                return result.ErrorMessage switch
+                {
+                    ErrorMessage.ExerciseNotFound => BadRequest(result.ErrorMessage),
+                    ErrorMessage.ExerciseDoesNotExist => NotFound(result.ErrorMessage),
+                    _ => StatusCode(StatusCodes.Status500InternalServerError, result.ErrorMessage)
+                };
+            }
 
             return NoContent();
         }
@@ -56,17 +73,20 @@ namespace FitnessApp.Controllers
         [HttpPost]
         public async Task<ActionResult<Exercise>> PostExercise(ExerciseDto exerciseDto)
         {
-            var wasPosted = await _exerciseService.PostExercise(exerciseDto);
+            var result = await _exerciseService.PostExercise(exerciseDto);
 
-            return CreatedAtAction(nameof(GetExercise), new { id = wasPosted.ExerciseId }, wasPosted);
+            return CreatedAtAction(nameof(GetExercise), new { id = result.Data.ExerciseId }, result);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteExercise(int id)
         {
-            var wasDeleted = await _exerciseService.DeleteExercise(id);
+            var result = await _exerciseService.DeleteExercise(id);
 
-            if (!wasDeleted) return NotFound();
+            if (result.ErrorMessage == ErrorMessage.ExerciseNotFound)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
 
             return NoContent();
         }

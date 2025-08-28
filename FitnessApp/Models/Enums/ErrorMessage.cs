@@ -7,6 +7,8 @@
         WorkoutIdNotFound,
         WorkoutDoesNotExist,
         Success,
-        ExerciseDoesNotMatchBodyParts
+        ExerciseDoesNotMatchBodyParts,
+        ExerciseNotFound,
+        ExerciseDoesNotExist
     }
 }

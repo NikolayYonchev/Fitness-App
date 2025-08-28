@@ -20,17 +20,17 @@ namespace FitnessApp.Controllers
     [ApiController]
     public class WorkoutsController : ControllerBase
     {
-        private readonly IWorkoutService _service;
+        private readonly IWorkoutService _workoutService;
 
         public WorkoutsController(IWorkoutService service)
         {
-            _service = service;
+            _workoutService = service;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Workout>>> GetWorkouts()
         {
-            var result = await _service.GetWorkouts();
+            var result = await _workoutService.GetWorkouts();
 
             if (result.ErrorMessage == ErrorMessage.WorkoutNotFound)
             {
@@ -43,7 +43,7 @@ namespace FitnessApp.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ServiceResult<WorkoutDto>>> GetWorkout(int workoutId)
         {
-            var result = await _service.GetWorkout(workoutId);
+            var result = await _workoutService.GetWorkout(workoutId);
 
             if (result.ErrorMessage == ErrorMessage.WorkoutNotFound)
             {
@@ -56,7 +56,7 @@ namespace FitnessApp.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutWorkout(int workoutId, Workout workout)
         {
-            var result = await _service.PutWorkout(workoutId, workout);
+            var result = await _workoutService.PutWorkout(workoutId, workout);
 
             if (!result.Success)
             {
@@ -99,9 +99,9 @@ namespace FitnessApp.Controllers
         [HttpPost]
         public async Task<ActionResult<ServiceResult<WorkoutDto>>> PostWorkout(WorkoutDto workoutDto)
         {
-            var result = await _service.PostWorkout(workoutDto);
+            var result = await _workoutService.PostWorkout(workoutDto);
 
-            return CreatedAtAction("GetWorkout", new { id = result.Data.WorkoutId }, result.Data);
+            return CreatedAtAction(nameof(GetWorkout), new { id = result.Data.WorkoutId }, result.Data);
 
             //var workout = new Workout()
             //{
@@ -118,13 +118,13 @@ namespace FitnessApp.Controllers
 
 
         [HttpPost("AddExercises")]
-        public async Task<ActionResult<ServiceEmptyResult>> AddExercisesToWorkout(int workoutId, List<int> exerciseIds)
+        public async Task<IActionResult> AddExercisesToWorkout(int workoutId, List<int> exerciseIds)
         {
-            var result = await _service.AddExercisesToWorkout(workoutId, exerciseIds);
+            var result = await _workoutService.AddExercisesToWorkout(workoutId, exerciseIds);
 
             if (!result.Success)
             {
-                if (result.ErrorMessage == ErrorMessage.BadRequest)
+                if (result.ErrorMessage == ErrorMessage.BadRequest) 
                 {
                     return BadRequest(result.ErrorMessage);
                 }
@@ -182,7 +182,7 @@ namespace FitnessApp.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteWorkout(int workoutId)
         {
-            var workout = await _service.DeleteWorkout(workoutId);
+            var workout = await _workoutService.DeleteWorkout(workoutId);
 
             if (workout.ErrorMessage == ErrorMessage.WorkoutNotFound)
             {

@@ -367,7 +367,7 @@ using (var scope = app.Services.CreateScope())
         }
     }
 }
-app.UseMiddleware<ErrorHandlingMiddleware>(); // Register error handling middleware
+//app.UseMiddleware<ErrorHandlingMiddleware>(); // Register error handling middleware
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

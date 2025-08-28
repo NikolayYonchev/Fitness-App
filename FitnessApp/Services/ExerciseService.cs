@@ -4,6 +4,8 @@ using FitnessApp.Models;
 using FitnessApp.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using FitnessApp.Shared;
+using FitnessApp.Models.Enums;
 
 namespace FitnessApp.Services
 {
@@ -16,19 +18,31 @@ namespace FitnessApp.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<Exercise>> GetExercises()
+        public async Task<ServiceResult<IEnumerable<Exercise>>> GetExercises()
         {
-            return await _context.Exercises.ToListAsync();
+            var result = await _context.Exercises.ToListAsync();
+
+            if (result == null)
+            {
+                return new ServiceResult<IEnumerable<Exercise>>()
+                {
+                    Data = result,
+                    ErrorMessage = ErrorMessage.ExerciseNotFound,
+                    Success = false
+                };
+            }
+
+            return new ServiceResult<IEnumerable<Exercise>>()
+            {
+                Data = result,
+                ErrorMessage = ErrorMessage.Success,
+                Success = true
+            };
         }
 
-        public async Task<ExerciseDto> GetExercise(int id)
+        public async Task<ServiceResult<ExerciseDto>> GetExercise(int id)
         {
             var exercise = await _context.Exercises.FindAsync(id);
-
-            if (exercise == null)
-            {
-                return null;
-            }
 
             var result = new ExerciseDto()
             {
@@ -38,14 +52,34 @@ namespace FitnessApp.Services
                 Complexity = exercise.Complexity,
                 Description = exercise.Description
             };
-            return result;
+
+            if (result == null)
+            {
+                return new ServiceResult<ExerciseDto>()
+                {
+                    Success = false,
+                    ErrorMessage = ErrorMessage.ExerciseNotFound,
+                    Data = result
+                };
+            }
+
+            return new ServiceResult<ExerciseDto>()
+            {
+                Success = true,
+                ErrorMessage = ErrorMessage.Success,
+                Data = result
+            };
         }
 
-        public async Task<bool> PutExercise(int id, Exercise exercise)
+        public async Task<ServiceEmptyResult> PutExercise(int id, Exercise exercise)
         {
             if (id != exercise.ExerciseId)
             {
-                return false;
+                return new ServiceEmptyResult()
+                {
+                    Success = false,
+                    ErrorMessage = ErrorMessage.ExerciseNotFound,
+                };
             }
 
             _context.Entry(exercise).State = EntityState.Modified;
@@ -58,18 +92,27 @@ namespace FitnessApp.Services
             {
                 if (!ExerciseExists(id))
                 {
-                    return false;
+                    return new ServiceEmptyResult()
+                    {
+                        Success = false,
+                        ErrorMessage = ErrorMessage.ExerciseNotFound,
+                    };
                 }
                 else
                 {
+                    //todo should i be throwing here
                     throw;
                 }
             }
 
-            return true;
+            return  new ServiceEmptyResult()
+            {
+                Success = true,
+                ErrorMessage = ErrorMessage.Success,
+            };
         }
 
-        public async Task<ExerciseDto> PostExercise(ExerciseDto dto)
+        public async Task<ServiceResult<ExerciseDto>> PostExercise(ExerciseDto dto)
         {
             var exercise = new Exercise
             {
@@ -83,7 +126,7 @@ namespace FitnessApp.Services
             _context.Exercises.Add(exercise);
             await _context.SaveChangesAsync();
 
-            return new ExerciseDto
+            var exerciseDto = new ExerciseDto
             {
                 ExerciseId = exercise.ExerciseId,
                 Description = exercise.Description,
@@ -92,21 +135,37 @@ namespace FitnessApp.Services
                 BodyPart = exercise.BodyPart,
                 Name = exercise.Name
             };
+
+            return new ServiceResult<ExerciseDto>()
+            {
+                Success = true,
+                Data = exerciseDto,
+                ErrorMessage = ErrorMessage.Success
+            };
         }
 
 
-        public async Task<bool> DeleteExercise(int id)
+        public async Task<ServiceEmptyResult> DeleteExercise(int id)
         {
             var exercise = await _context.Exercises.FindAsync(id);
+
             if (exercise == null)
             {
-                return false;
+                return new ServiceEmptyResult()
+                {
+                    Success = false,
+                    ErrorMessage = ErrorMessage.ExerciseNotFound
+                };
             }
 
             _context.Exercises.Remove(exercise);
             await _context.SaveChangesAsync();
 
-            return true;
+            return new ServiceEmptyResult()
+            {
+                Success = true,
+                ErrorMessage = ErrorMessage.Success
+            }; ;
         }
 
         protected bool ExerciseExists(int id)
