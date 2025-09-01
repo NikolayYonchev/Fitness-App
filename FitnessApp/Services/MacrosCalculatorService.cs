@@ -5,10 +5,11 @@ using FitnessApp.Services.Contracts;
 
 namespace FitnessApp.Services
 {
-    public class MacrosCalculatorService : IMacrosCalculatorService
+    //todo make it a static method
+    public static class MacrosCalculatorService //: IMacrosCalculatorService
     {
         //minimal api
-        public MacrosDto CalculateMacros(MacrosCalculator data)
+        public static MacrosDto CalculateMacros(MacrosCalculator data)
         {
             double activityFactor;
             double BMR;

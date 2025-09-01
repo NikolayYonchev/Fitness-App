@@ -159,8 +159,6 @@ namespace FitnessApp.Controllers
         [HttpPost("LogMeal")]
         public async Task<ActionResult<MealLog>> LogMeal(int mealId)
         {
-            //normalno li e da trqbva da se authoriziram v postman vseki put za da se izpulni methoda i da trq
-            //da smenqm tokena v zaqvkata
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var currentMeal = await _context.Meals

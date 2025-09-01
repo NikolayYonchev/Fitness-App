@@ -1,6 +1,6 @@
 ﻿namespace FitnessApp.Models.Enums
 {
-    public enum ErrorMessage
+    public enum ResponseMessage
     {
         WorkoutNotFound,
         BadRequest,
@@ -9,6 +9,7 @@
         Success,
         ExerciseDoesNotMatchBodyParts,
         ExerciseNotFound,
-        ExerciseDoesNotExist
+        ExerciseDoesNotExist,
+        MealNotFound
     }
 }

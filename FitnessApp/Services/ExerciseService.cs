@@ -27,7 +27,7 @@ namespace FitnessApp.Services
                 return new ServiceResult<IEnumerable<Exercise>>()
                 {
                     Data = result,
-                    ErrorMessage = ErrorMessage.ExerciseNotFound,
+                    ResponseMessage = ResponseMessage.ExerciseNotFound,
                     Success = false
                 };
             }
@@ -35,7 +35,7 @@ namespace FitnessApp.Services
             return new ServiceResult<IEnumerable<Exercise>>()
             {
                 Data = result,
-                ErrorMessage = ErrorMessage.Success,
+                ResponseMessage = ResponseMessage.Success,
                 Success = true
             };
         }
@@ -58,7 +58,7 @@ namespace FitnessApp.Services
                 return new ServiceResult<ExerciseDto>()
                 {
                     Success = false,
-                    ErrorMessage = ErrorMessage.ExerciseNotFound,
+                    ResponseMessage = ResponseMessage.ExerciseNotFound,
                     Data = result
                 };
             }
@@ -66,7 +66,7 @@ namespace FitnessApp.Services
             return new ServiceResult<ExerciseDto>()
             {
                 Success = true,
-                ErrorMessage = ErrorMessage.Success,
+                ResponseMessage = ResponseMessage.Success,
                 Data = result
             };
         }
@@ -78,7 +78,7 @@ namespace FitnessApp.Services
                 return new ServiceEmptyResult()
                 {
                     Success = false,
-                    ErrorMessage = ErrorMessage.ExerciseNotFound,
+                    ResponseMessage = ResponseMessage.ExerciseNotFound,
                 };
             }
 
@@ -95,7 +95,7 @@ namespace FitnessApp.Services
                     return new ServiceEmptyResult()
                     {
                         Success = false,
-                        ErrorMessage = ErrorMessage.ExerciseNotFound,
+                        ResponseMessage = ResponseMessage.ExerciseNotFound,
                     };
                 }
                 else
@@ -108,7 +108,7 @@ namespace FitnessApp.Services
             return  new ServiceEmptyResult()
             {
                 Success = true,
-                ErrorMessage = ErrorMessage.Success,
+                ResponseMessage = ResponseMessage.Success,
             };
         }
 
@@ -140,7 +140,7 @@ namespace FitnessApp.Services
             {
                 Success = true,
                 Data = exerciseDto,
-                ErrorMessage = ErrorMessage.Success
+                ResponseMessage = ResponseMessage.Success
             };
         }
 
@@ -154,7 +154,7 @@ namespace FitnessApp.Services
                 return new ServiceEmptyResult()
                 {
                     Success = false,
-                    ErrorMessage = ErrorMessage.ExerciseNotFound
+                    ResponseMessage = ResponseMessage.ExerciseNotFound
                 };
             }
 
@@ -164,7 +164,7 @@ namespace FitnessApp.Services
             return new ServiceEmptyResult()
             {
                 Success = true,
-                ErrorMessage = ErrorMessage.Success
+                ResponseMessage = ResponseMessage.Success
             }; ;
         }
 

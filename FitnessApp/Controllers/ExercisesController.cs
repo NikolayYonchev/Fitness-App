@@ -31,9 +31,9 @@ namespace FitnessApp.Controllers
         {
             var result = await _exerciseService.GetExercises();
 
-            if (result.ErrorMessage == ErrorMessage.ExerciseNotFound)
+            if (result.ResponseMessage == ResponseMessage.ExerciseNotFound)
             {
-                return NotFound(result.ErrorMessage);
+                return NotFound(result.ResponseMessage);
             }
 
             return Ok(result.Data);
@@ -44,9 +44,9 @@ namespace FitnessApp.Controllers
         {
             var result = await _exerciseService.GetExercise(id);
 
-            if (result.ErrorMessage == ErrorMessage.ExerciseNotFound)
+            if (result.ResponseMessage == ResponseMessage.ExerciseNotFound)
             {
-                return NotFound(result.ErrorMessage);
+                return NotFound(result.ResponseMessage);
             }
 
             return Ok(result);
@@ -59,11 +59,11 @@ namespace FitnessApp.Controllers
 
             if (!result.Success)
             {
-                return result.ErrorMessage switch
+                return result.ResponseMessage switch
                 {
-                    ErrorMessage.ExerciseNotFound => BadRequest(result.ErrorMessage),
-                    ErrorMessage.ExerciseDoesNotExist => NotFound(result.ErrorMessage),
-                    _ => StatusCode(StatusCodes.Status500InternalServerError, result.ErrorMessage)
+                    ResponseMessage.ExerciseNotFound => BadRequest(result.ResponseMessage),
+                    ResponseMessage.ExerciseDoesNotExist => NotFound(result.ResponseMessage),
+                    _ => StatusCode(StatusCodes.Status500InternalServerError, result.ResponseMessage)
                 };
             }
 
@@ -83,9 +83,9 @@ namespace FitnessApp.Controllers
         {
             var result = await _exerciseService.DeleteExercise(id);
 
-            if (result.ErrorMessage == ErrorMessage.ExerciseNotFound)
+            if (result.ResponseMessage == ResponseMessage.ExerciseNotFound)
             {
-                return BadRequest(result.ErrorMessage);
+                return BadRequest(result.ResponseMessage);
             }
 
             return NoContent();

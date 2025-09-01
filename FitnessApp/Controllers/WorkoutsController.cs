@@ -32,9 +32,9 @@ namespace FitnessApp.Controllers
         {
             var result = await _workoutService.GetWorkouts();
 
-            if (result.ErrorMessage == ErrorMessage.WorkoutNotFound)
+            if (result.ResponseMessage == ResponseMessage.WorkoutNotFound)
             {
-                return NotFound(result.ErrorMessage);
+                return NotFound(result.ResponseMessage);
             }
 
             return Ok(result.Data);
@@ -45,9 +45,9 @@ namespace FitnessApp.Controllers
         {
             var result = await _workoutService.GetWorkout(workoutId);
 
-            if (result.ErrorMessage == ErrorMessage.WorkoutNotFound)
+            if (result.ResponseMessage == ResponseMessage.WorkoutNotFound)
             {
-                return NotFound(result.ErrorMessage);
+                return NotFound(result.ResponseMessage);
             }
 
             return Ok(result.Data);
@@ -60,11 +60,11 @@ namespace FitnessApp.Controllers
 
             if (!result.Success)
             {
-                return result.ErrorMessage switch
+                return result.ResponseMessage switch
                 {
-                    ErrorMessage.WorkoutIdNotFound => BadRequest(result.ErrorMessage),
-                    ErrorMessage.WorkoutDoesNotExist => NotFound(result.ErrorMessage),
-                    _ => StatusCode(StatusCodes.Status500InternalServerError, result.ErrorMessage)
+                    ResponseMessage.WorkoutIdNotFound => BadRequest(result.ResponseMessage),
+                    ResponseMessage.WorkoutDoesNotExist => NotFound(result.ResponseMessage),
+                    _ => StatusCode(StatusCodes.Status500InternalServerError, result.ResponseMessage)
                 };
             }
 
@@ -124,13 +124,13 @@ namespace FitnessApp.Controllers
 
             if (!result.Success)
             {
-                if (result.ErrorMessage == ErrorMessage.BadRequest) 
+                if (result.ResponseMessage == ResponseMessage.BadRequest) 
                 {
-                    return BadRequest(result.ErrorMessage);
+                    return BadRequest(result.ResponseMessage);
                 }
-                else if (result.ErrorMessage == ErrorMessage.ExerciseDoesNotMatchBodyParts)
+                else if (result.ResponseMessage == ResponseMessage.ExerciseDoesNotMatchBodyParts)
                 {
-                    return BadRequest(result.ErrorMessage);
+                    return BadRequest(result.ResponseMessage);
                 }
             }
 
@@ -184,7 +184,7 @@ namespace FitnessApp.Controllers
         {
             var workout = await _workoutService.DeleteWorkout(workoutId);
 
-            if (workout.ErrorMessage == ErrorMessage.WorkoutNotFound)
+            if (workout.ResponseMessage == ResponseMessage.WorkoutNotFound)
             {
                 return NotFound();
             }
